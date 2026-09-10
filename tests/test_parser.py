@@ -106,6 +106,28 @@ class ParseLineTests(unittest.TestCase):
 
         self.assertEqual([event.username for event in events], ["first", "second"])
 
+    def test_parse_lines_advances_year_after_december_to_january_rollover(self) -> None:
+        lines = [
+            (
+                "Dec 31 23:59:30 host sshd[1]: Failed password for admin "
+                "from 192.0.2.10 port 50001 ssh2\n"
+            ),
+            (
+                "Jan  1 00:00:00 host sshd[1]: Failed password for admin "
+                "from 192.0.2.10 port 50002 ssh2\n"
+            ),
+        ]
+
+        events = list(parse_lines(lines, assumed_year=2026))
+
+        self.assertEqual(
+            [event.occurred_at for event in events],
+            [
+                datetime(2026, 12, 31, 23, 59, 30, tzinfo=timezone.utc),
+                datetime(2027, 1, 1, 0, 0, tzinfo=timezone.utc),
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

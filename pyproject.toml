@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ssh-log-sentinel"
-version = "0.2.0"
+version = "0.4.0"
 description = "CLI acadêmica para analisar logs de autenticação OpenSSH."
 readme = "README.md"
 requires-python = ">=3.11"

@@ -1,0 +1,6 @@
+Jan 10 12:00:00 servidor sshd[2000]: Failed password for invalid user admin from 192.0.2.50 port 52000 ssh2
+Jan 10 12:01:00 servidor sshd[2001]: Failed password for root from 192.0.2.50 port 52001 ssh2
+Jan 10 12:02:00 servidor sshd[2002]: Failed password for invalid user oracle from 192.0.2.50 port 52002 ssh2
+Jan 10 12:03:00 servidor sshd[2003]: Failed password for invalid user postgres from 192.0.2.50 port 52003 ssh2
+Jan 10 12:04:00 servidor sshd[2004]: Failed password for invalid user admin from 192.0.2.50 port 52004 ssh2
+Jan 10 12:04:30 servidor sshd[2005]: Accepted password for alice from 198.51.100.20 port 53000 ssh2

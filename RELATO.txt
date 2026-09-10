@@ -130,3 +130,133 @@ conter "adminfrom". O arquivo teste-auth.log foi conferido diretamente e contém
 corretamente "admin from". Como a linha foi reconhecida pelo parser e o arquivo
 está correto, a diferença foi tratada como artefato de transcrição, não como
 resultado do programa.
+
+
+Etapa: terceiro incremento — detector integrado à CLI
+
+
+Decisão humana:
+A solicitação seguinte foi executar o que estava descrito na especificação: integração explícita do detector à
+CLI, mantendo bloqueio automático fora do escopo.
+
+Decisões técnicas:
+- O modo anterior permanece como padrão. A detecção só é ativada por --detect.
+- O limiar padrão foi definido como cinco falhas e a janela padrão como 300
+  segundos, ambos configuráveis pela linha de comando.
+- Em modo de detecção, a saída padrão contém somente alertas JSON; o resumo de
+  processamento é mantido na saída de erro.
+- Foram definidos códigos de saída: 0 sem alertas, 1 com alertas e 2 para erro de
+  leitura, configuração ou ausência de horário normalizado.
+- Logs syslog sem ano são rejeitados no modo de detecção para não produzir uma
+  classificação baseada em datas inventadas.
+- Os alertas são acumulados antes da impressão, evitando saída parcial caso um
+  erro temporal seja encontrado mais adiante no arquivo.
+- Foi criado examples/sample-brute-force.log para demonstração reproduzível,
+  sem alterar o teste-auth.log preparado pelo aluno.
+- O programa continua sem executar bloqueio ou alteração de firewall.
+
+Validações executadas em 10/09/2026:
+- A primeira execução da suíte após integrar a CLI aprovou dezoito testes.
+- Após acrescentar o caso de configuração inválida na CLI, a suíte final
+  executou dezenove testes, todos aprovados.
+- O exemplo foi processado com a configuração padrão de detecção e produziu um
+  alerta para 192.0.2.50 após cinco falhas em quatro minutos. O processo retornou
+  código 1, conforme a semântica documentada de alerta encontrado.
+- O mesmo exemplo, com limiar alterado para seis, não produziu alerta e retornou
+  código zero.
+- A compilação de src e tests com compileall terminou sem erros.
+
+Resultado observado:
+O detector pode agora ser utilizado pela CLI de forma explícita, configurável e
+testável, preservando o comportamento anterior quando --detect não é usado.
+
+
+Validação humana do terceiro incremento:
+O aluno executou a suíte completa e compartilhou a saída com dezenove testes
+aprovados, mensagem final "OK" e código de saída zero.
+
+No teste positivo de detecção com o arquivo examples/sample-brute-force.log,
+ano 2026 e fuso UTC-3, a CLI emitiu um alerta para 192.0.2.50 com cinco
+tentativas, usuários admin, root, oracle e postgres, início da janela às
+15:00:00 UTC e detecção às 15:04:00 UTC. O resumo informou cinco linhas
+reconhecidas, uma ignorada e um alerta; o código de saída observado foi 1.
+
+Ao elevar o limiar para seis, o aluno observou zero alertas e código de saída
+zero. Ao executar a detecção sobre o mesmo syslog sem informar o ano, observou a
+mensagem de ausência de occurred_at e o código de saída 2. Os resultados
+coincidiram com a especificação dos três códigos de processo.
+
+Conclusão da validação humana:
+O aluno avaliou os resultados e informou que tudo parecia correto. O terceiro
+incremento foi considerado validado sem necessidade de refinamento do código
+nesta etapa.
+
+
+Etapa: quarto incremento — robustez de entrada e saída
+
+Prompt recebido:
+Depois da validação do terceiro incremento, o aluno respondeu: "certo pode
+prosseguir".
+
+Decisão humana:
+A autorização foi aplicada ao próximo incremento descrito na especificação:
+entrada padrão, fusos com minutos, saída opcional de alertas e tratamento da
+virada do ano, sem ampliar o escopo para bloqueio automático.
+
+Decisões técnicas:
+- O caractere - foi adotado como caminho convencional para leitura de stdin.
+- Foi criada a opção --utc-offset no formato ±HH:MM. A opção anterior
+  --utc-offset-hours foi preservada e as duas são mutuamente exclusivas.
+- --year passou a representar o ano do primeiro evento syslog reconhecido. Uma
+  regressão superior a 180 dias é interpretada como avanço para o ano seguinte.
+- --alerts-file grava JSON Lines somente junto de --detect. Os alertas são
+  escritos após a análise completa, evitando arquivo com conclusões parciais em
+  caso de erro temporal posterior.
+- A entrada permanece incremental; apenas os alertas são acumulados antes da
+  publicação.
+- Foi criado examples/sample-year-rollover.log para demonstrar a transição de
+  dezembro para janeiro.
+- O bloqueio de endereços e alterações de firewall continuam fora do escopo.
+
+Validações executadas em 10/09/2026:
+- A suíte completa executou vinte e cinco testes, todos aprovados.
+- A compilação de src e tests com compileall terminou sem erros.
+- O exemplo de força bruta foi enviado à CLI por pipeline e stdin; o mesmo
+  alerta esperado foi produzido, com código de saída 1.
+- O exemplo de virada do ano produziu um alerta cuja janela começou em
+  31/12/2026 às 23:59:30 UTC e terminou em 01/01/2027 às 00:00:00 UTC.
+- O teste-auth.log foi processado com offset UTC-03:30 e os horários foram
+  convertidos corretamente para 16:04:56 e 16:05:02 UTC.
+- A gravação de alerta em arquivo temporário foi validada pela suíte de ponta a
+  ponta, sem duplicação na saída padrão.
+
+Resultado observado:
+O quarto incremento ampliou as formas de entrada, representação de fuso e saída
+sem modificar a regra de detecção nem introduzir ações automáticas.
+
+
+Validação humana do quarto incremento:
+O aluno executou a suíte completa e compartilhou a saída com vinte e cinco
+testes aprovados, mensagem final "OK" e código de saída zero.
+
+A leitura por entrada padrão foi validada enviando o exemplo de força bruta por
+pipeline. A CLI produziu o alerta esperado para 192.0.2.50, informou cinco
+linhas reconhecidas, uma ignorada e um alerta, e retornou código 1.
+
+O aluno processou o teste-auth.log com o offset UTC-03:30 e observou as
+conversões para 16:04:56 e 16:05:02 UTC, duas linhas reconhecidas, duas
+ignoradas e código de saída zero.
+
+No exemplo de virada do ano, a janela começou em 31/12/2026 às 23:59:30 UTC e a
+detecção ocorreu em 01/01/2027 às 00:00:00 UTC. Foram reconhecidas duas linhas,
+emitido um alerta e observado o código de saída 1.
+
+A opção --alerts-file foi validada com o arquivo alerts-validacao.jsonl. O
+terminal exibiu somente o resumo, e a leitura posterior do arquivo mostrou o
+alerta JSON esperado para 192.0.2.50. O arquivo gerado pelo aluno foi preservado
+como evidência local da validação.
+
+Conclusão da validação humana:
+O aluno informou que tudo funcionou perfeitamente. Os resultados observados
+coincidiram com os critérios de aceite do quarto incremento, sem necessidade de
+refinamento do código nesta etapa.

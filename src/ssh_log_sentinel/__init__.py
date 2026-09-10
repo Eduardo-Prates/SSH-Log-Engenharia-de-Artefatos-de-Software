@@ -2,14 +2,15 @@
 
 from .detector import detect_brute_force
 from .models import BruteForceAlert, FailedAuthenticationAttempt
-from .parser import normalize_timestamp, parse_line, parse_lines
+from .parser import TimestampNormalizer, normalize_timestamp, parse_line, parse_lines
 
 __all__ = [
     "BruteForceAlert",
     "FailedAuthenticationAttempt",
+    "TimestampNormalizer",
     "detect_brute_force",
     "normalize_timestamp",
     "parse_line",
     "parse_lines",
 ]
-__version__ = "0.2.0"
+__version__ = "0.4.0"

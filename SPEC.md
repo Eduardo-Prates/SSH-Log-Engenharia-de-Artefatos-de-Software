@@ -97,6 +97,9 @@ Para cada linha reconhecida, o parser fornece:
 ├── README.md
 ├── RELATO.txt
 ├── SPEC.md
+├── examples/
+│   ├── sample-brute-force.log
+│   └── sample-year-rollover.log
 ├── src/
 │   └── ssh_log_sentinel/
 │       ├── __init__.py
@@ -149,10 +152,83 @@ pela CLI. Isso permite validar a regra separadamente antes de expô-la ao usuár
   rejeitados explicitamente, evitando uma conclusão silenciosamente incorreta.
 - **CA-15:** nenhuma ação automática de bloqueio é executada.
 
-## 10. Próximo incremento proposto
+## 10. Terceiro incremento — integração opt-in à CLI
 
-Integrar o detector à CLI por uma opção explícita, definir os parâmetros de
-limiar e janela na linha de comando e emitir alertas em formato JSON separado
-dos eventos brutos. Antes disso, devem ser definidos o código de saída e o
-comportamento para logs syslog sem ano, além de testes de ponta a ponta. O
-bloqueio automático de IP continua fora do escopo.
+### 10.1 Interface
+
+- `--detect` ativa a detecção e faz a saída padrão conter somente alertas JSON;
+- `--threshold N` define o número mínimo de falhas, com padrão 5;
+- `--window-seconds S` define a janela, com padrão 300 segundos;
+- `--year` é obrigatório na prática para detectar sobre timestamps syslog, pois
+  eventos sem horário normalizado são recusados;
+- `--utc-offset-hours H` informa o deslocamento inteiro do log em relação a UTC.
+
+O modo sem `--detect` permanece compatível com os incrementos anteriores e
+continua emitindo os eventos normalizados.
+
+### 10.2 Saída e códigos de processo
+
+Cada alerta é um JSON com tipo de registro, IP, início da janela, instante de
+detecção, quantidade de tentativas e usuários observados. O resumo é escrito na
+saída de erro, portanto sua ordem visual em relação ao JSON pode variar.
+
+- código `0`: análise concluída sem alertas;
+- código `1`: análise concluída com pelo menos um alerta;
+- código `2`: erro de leitura, configuração ou ausência de horário normalizado.
+
+O código `1` sinaliza uma descoberta de segurança para facilitar automação; não
+representa falha interna da aplicação.
+
+### 10.3 Critérios de aceite
+
+- **CA-16:** sem `--detect`, a saída de eventos e o código zero são preservados.
+- **CA-17:** com `--detect`, atingir o limiar gera alerta JSON e código 1.
+- **CA-18:** uma análise válida sem atingir o limiar não gera JSON e retorna 0.
+- **CA-19:** syslog sem ano no modo de detecção gera mensagem clara e código 2.
+- **CA-20:** limiar ou janela inválidos geram código 2.
+- **CA-21:** a saída de alerta não contém comandos ou efeitos de bloqueio.
+
+## 11. Quarto incremento — robustez de entrada e saída
+
+### 11.1 Interface e comportamento
+
+- o valor `-` em `log_file` lê o conteúdo da entrada padrão;
+- `--utc-offset=±HH:MM` aceita deslocamentos com minutos;
+- `--utc-offset-hours` permanece disponível por compatibilidade e é mutuamente
+  exclusivo com a nova opção;
+- `--alerts-file PATH` grava um alerta JSON por linha e requer `--detect`;
+- quando o arquivo de alertas é usado, a saída padrão permanece vazia;
+- a entrada continua sendo processada incrementalmente; somente a coleção de
+  alertas é mantida até o término para impedir a publicação de resultado parcial
+  caso uma inconsistência temporal seja encontrada.
+
+### 11.2 Estratégia para virada do ano
+
+No formato syslog, `--year` define o ano do primeiro evento reconhecido. Como o
+log não contém o ano, uma regressão de calendário superior a 180 dias é
+interpretada como virada para o ano seguinte. Assim, `Dec 31 23:59:30` seguido de
+`Jan 1 00:00:00` é colocado corretamente em anos consecutivos.
+
+A heurística deve ser informada ao usuário porque um arquivo muito esparso ou
+fora de ordem pode ser ambíguo. Regressões menores não avançam o ano e continuam
+sujeitas à verificação de ordem do detector.
+
+### 11.3 Critérios de aceite
+
+- **CA-22:** usar `-` processa dados da entrada padrão sem fechar o fluxo global.
+- **CA-23:** um offset com minutos é aplicado corretamente na conversão para UTC.
+- **CA-24:** a opção antiga de fuso em horas permanece funcional.
+- **CA-25:** eventos entre dezembro e janeiro recebem anos consecutivos e podem
+  participar da mesma janela de detecção.
+- **CA-26:** `--alerts-file` grava JSON Lines somente no modo de detecção e não
+  duplica os alertas na saída padrão.
+- **CA-27:** erros durante leitura, detecção ou escrita retornam código 2.
+- **CA-28:** nenhuma dessas opções executa resposta automática ou bloqueio.
+
+## 12. Próximo incremento proposto
+
+Preparar o artefato para entrega e reprodução: adicionar verificação automatizada
+em múltiplas versões suportadas do Python, revisar mensagens de erro e ajuda,
+documentar limitações de formatos OpenSSH e avaliar o parser com uma amostra
+maior e anonimizada. Novos formatos de autenticação só devem ser incluídos após
+casos reais e critérios de aceite correspondentes.

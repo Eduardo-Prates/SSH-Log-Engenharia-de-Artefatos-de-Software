@@ -1,7 +1,8 @@
 """Parser do subconjunto inicial de mensagens de autenticação OpenSSH."""
 
 from collections.abc import Iterable, Iterator
-from datetime import datetime, timezone, tzinfo
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone, tzinfo
 from ipaddress import ip_address
 import re
 
@@ -78,11 +79,69 @@ def normalize_timestamp(
         return None
 
 
+@dataclass(slots=True)
+class TimestampNormalizer:
+    """Mantém o contexto necessário para timestamps syslog entre linhas.
+
+    ``assumed_year`` é o ano do primeiro evento syslog reconhecido. Uma regressão
+    superior a ``rollover_threshold`` é interpretada como passagem para o ano
+    seguinte.
+    """
+
+    assumed_year: int | None = None
+    default_timezone: tzinfo = timezone.utc
+    rollover_threshold: timedelta = timedelta(days=180)
+    _current_year: int | None = field(init=False)
+    _latest_syslog_timestamp: datetime | None = field(default=None, init=False)
+
+    def __post_init__(self) -> None:
+        if self.rollover_threshold <= timedelta(0):
+            raise ValueError("rollover_threshold deve ser positivo")
+        self._current_year = self.assumed_year
+
+    def normalize(self, timestamp_text: str) -> datetime | None:
+        if timestamp_text[:1].isdigit():
+            return normalize_timestamp(
+                timestamp_text,
+                default_timezone=self.default_timezone,
+            )
+
+        occurred_at = normalize_timestamp(
+            timestamp_text,
+            assumed_year=self._current_year,
+            default_timezone=self.default_timezone,
+        )
+        if occurred_at is None:
+            return None
+
+        if (
+            self._latest_syslog_timestamp is not None
+            and self._latest_syslog_timestamp - occurred_at
+            > self.rollover_threshold
+        ):
+            assert self._current_year is not None
+            self._current_year += 1
+            occurred_at = normalize_timestamp(
+                timestamp_text,
+                assumed_year=self._current_year,
+                default_timezone=self.default_timezone,
+            )
+            assert occurred_at is not None
+
+        if (
+            self._latest_syslog_timestamp is None
+            or occurred_at > self._latest_syslog_timestamp
+        ):
+            self._latest_syslog_timestamp = occurred_at
+        return occurred_at
+
+
 def parse_line(
     line: str,
     *,
     assumed_year: int | None = None,
     default_timezone: tzinfo = timezone.utc,
+    timestamp_normalizer: TimestampNormalizer | None = None,
 ) -> FailedAuthenticationAttempt | None:
     """Converte uma linha suportada em evento; retorna ``None`` caso contrário."""
 
@@ -106,13 +165,18 @@ def parse_line(
 
     process_id_text = envelope.group("process_id")
     timestamp = envelope.group("timestamp")
-    return FailedAuthenticationAttempt(
-        timestamp=timestamp,
-        occurred_at=normalize_timestamp(
+    occurred_at = (
+        timestamp_normalizer.normalize(timestamp)
+        if timestamp_normalizer is not None
+        else normalize_timestamp(
             timestamp,
             assumed_year=assumed_year,
             default_timezone=default_timezone,
-        ),
+        )
+    )
+    return FailedAuthenticationAttempt(
+        timestamp=timestamp,
+        occurred_at=occurred_at,
         hostname=envelope.group("hostname"),
         process_id=int(process_id_text) if process_id_text is not None else None,
         username=failure.group("username"),
@@ -132,10 +196,13 @@ def parse_lines(
 ) -> Iterator[FailedAuthenticationAttempt]:
     """Produz, em ordem, somente os eventos reconhecidos em ``lines``."""
 
+    timestamp_normalizer = TimestampNormalizer(
+        assumed_year=assumed_year,
+        default_timezone=default_timezone,
+    )
     for line in lines:
         if event := parse_line(
             line,
-            assumed_year=assumed_year,
-            default_timezone=default_timezone,
+            timestamp_normalizer=timestamp_normalizer,
         ):
             yield event
