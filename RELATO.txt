@@ -1,0 +1,132 @@
+Etapa: definição e decomposição do problema
+
+Modelo utilizado: GPT-5.6 Sol High
+
+Objetivo do prompt:
+Solicitar ajuda para interpretar o enunciado, escolher um problema
+de Cibersegurança e planejar um artefato compatível com o prazo.
+
+Resultado:
+Foi proposta uma ferramenta CLI para detectar possíveis ataques de
+força bruta em logs SSH.
+
+Decisão do aluno:
+A proposta foi escolhida por possuir um problema concreto, escopo
+controlado, execução segura e boas condições de teste e reprodução.
+
+Intervenção humana:
+O aluno avaliou as alternativas e aprovou a proposta, mantendo fora
+do escopo o bloqueio automático de endereços IP.
+
+
+
+Etapa: especificação e primeiro incremento executável
+
+Prompt recebido:
+Foi solicitado continuar o desenvolvimento, examinar e preservar
+este relato, criar uma especificação em SPEC.md e preparar uma CLI em Python
+3.11+ para analisar logs de autenticação OpenSSH. O pedido limitou o primeiro
+incremento a requisitos, critérios de aceite, estrutura do projeto e parser
+inicial com testes, sem implementar o detector completo.
+
+Decisões humanas registradas nesta etapa:
+O escopo reduzido do primeiro incremento e a preservação deste relato foram
+determinados explicitamente no prompt. Não houve autorização para reintroduzir
+bloqueio automático nem para antecipar o detector de força bruta.
+
+Decisões técnicas:
+- Foi adotada uma estrutura src, com modelo de domínio, parser e CLI separados.
+- O parser reconhece somente mensagens "Failed password". Mensagens "Invalid
+  user" isoladas são ignoradas para não contar duas vezes uma mesma tentativa.
+- IPv4, IPv6 e porta são validados antes da criação do evento.
+- O timestamp tradicional do syslog permanece textual, pois ele não contém ano;
+  sua normalização foi adiada para o próximo incremento.
+- A CLI emite JSON por linha reconhecida e não agrega, classifica ou bloqueia IPs.
+- Foram usadas apenas dependências da biblioteca padrão durante a execução.
+
+Refinamento realizado:
+Após a primeira suíte com seis testes do parser, foi acrescentado um teste da
+CLI para validar conjuntamente a saída JSON e o resumo de linhas reconhecidas e
+ignoradas.
+
+Validações executadas em 10/09/2026:
+- Ambiente identificado: Python 3.14.6, compatível com o requisito Python 3.11+.
+- Comando "python -m unittest discover -s tests -v", com src no PYTHONPATH:
+  sete testes executados e aprovados.
+- Compilação de src e tests com compileall: concluída sem erros.
+- Execução de "python -m ssh_log_sentinel --help", com src no PYTHONPATH:
+  concluída com código de saída zero e ajuda exibida.
+
+Resultado observado:
+O primeiro incremento ficou executável e coberto pelos casos de aceite básicos
+do parser e da CLI. A detecção por limiar e janela de tempo permanece pendente,
+conforme o limite definido para esta etapa.
+
+
+Validação humana do primeiro incremento:
+O aluno executou localmente a suíte de testes e compartilhou a saída observada:
+sete testes aprovados, mensagem final "OK" e código de saída zero. Em seguida,
+executou a CLI sobre o arquivo teste-auth.log e observou dois eventos JSON
+corretos, um para o usuário alice em IPv4 e outro para o usuário inválido admin
+em IPv6, além do resumo "reconhecidas=2 ignoradas=2".
+
+Decisão humana:
+Após conferir os resultados, o aluno afirmou que tudo parecia correto,
+autorizou o registro dessa validação e solicitou seguir em frente.
+
+
+Etapa: segundo incremento — normalização temporal e detector isolado
+
+Objetivo:
+Executar o próximo incremento previsto na especificação sem introduzir bloqueio
+automático e sem misturar prematuramente a regra de detecção à CLI.
+
+Decisões técnicas:
+- Foi acrescentado ao evento o campo occurred_at, representado por datetime com
+  fuso e normalizado para UTC.
+- Timestamps ISO 8601 são normalizados diretamente. Para o formato syslog, ano
+  e deslocamento UTC devem ser informados explicitamente; sem ano, occurred_at
+  permanece nulo em vez de o programa inventar uma data.
+- O detector foi implementado em módulo separado e recebe limiar e janela
+  configuráveis.
+- A janela inclui eventos exatamente no seu limite temporal.
+- Cada IP possui estado independente. Um fluxo contínuo gera somente um alerta
+  e o detector é rearmado após intervalo sem falhas maior que a janela.
+- Eventos sem occurred_at ou fora de ordem para o mesmo IP são rejeitados para
+  evitar resultados silenciosamente incorretos.
+- A CLI apenas expõe a normalização temporal neste incremento; ela ainda não
+  executa o detector nem bloqueia endereços.
+
+Validações executadas em 10/09/2026:
+- A suíte completa executou quinze testes, todos aprovados.
+- Foram exercitados limiar, janela, separação entre IPs, supressão de alertas
+  repetidos, rearme, configuração inválida e ordem cronológica.
+- O parser foi validado convertendo um horário syslog de UTC-3 para UTC com ano
+  fornecido explicitamente.
+- A CLI foi executada sobre o teste-auth.log com ano 2026 e UTC-3; produziu os
+  dois eventos esperados, com occurred_at em UTC, e manteve o resumo
+  "reconhecidas=2 ignoradas=2".
+- A compilação de src e tests com compileall terminou sem erros.
+
+Resultado observado:
+O segundo incremento fornece a regra de detecção como componente testado e
+independente. A integração opt-in dessa regra à CLI fica reservada para o
+próximo incremento.
+
+
+Validação humana do segundo incremento:
+O aluno executou a suíte completa e compartilhou a saída com quinze testes
+aprovados, mensagem final "OK" e código de saída zero.
+
+Na execução da CLI com `--year 2026 --utc-offset-hours=-3`, o aluno observou os
+horários `2026-01-10T15:34:56+00:00` e `2026-01-10T15:35:02+00:00`, confirmando
+a conversão dos registros de UTC-3 para UTC. A execução sem `--year` apresentou
+`occurred_at` nulo nos dois eventos, conforme a decisão de não inferir o ano.
+Ambas as execuções mantiveram o resumo "reconhecidas=2 ignoradas=2".
+
+Conferência adicional:
+Na saída colada na conversa, a última representação de raw_line aparentava
+conter "adminfrom". O arquivo teste-auth.log foi conferido diretamente e contém
+corretamente "admin from". Como a linha foi reconhecida pelo parser e o arquivo
+está correto, a diferença foi tratada como artefato de transcrição, não como
+resultado do programa.

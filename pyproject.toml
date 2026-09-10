@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ssh-log-sentinel"
+version = "0.2.0"
+description = "CLI acadêmica para analisar logs de autenticação OpenSSH."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "SSH Log Sentinel contributors" }]
+dependencies = []
+
+[project.scripts]
+ssh-log-sentinel = "ssh_log_sentinel.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
