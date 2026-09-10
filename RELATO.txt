@@ -260,3 +260,25 @@ Conclusão da validação humana:
 O aluno informou que tudo funcionou perfeitamente. Os resultados observados
 coincidiram com os critérios de aceite do quarto incremento, sem necessidade de
 refinamento do código nesta etapa.
+
+
+Validação humana de instalação limpa:
+Após publicar no GitHub o estado produzido até o quarto incremento, mantendo
+teste-auth.log e alerts-validacao.jsonl como evidências versionadas, o aluno
+criou e ativou um ambiente virtual novo com venv.
+
+O comando "python -m pip install -e ." construiu o wheel editável e instalou
+com sucesso o pacote ssh-log-sentinel 0.4.0. Dentro do ambiente virtual, sem
+configurar PYTHONPATH, o comando "ssh-log-sentinel --help" exibiu corretamente
+a interface completa da aplicação.
+
+No mesmo ambiente, a suíte executou vinte e cinco testes, todos aprovados, com
+código de saída zero. A execução do comando instalado sobre
+examples/sample-brute-force.log produziu o alerta esperado para 192.0.2.50,
+informou cinco linhas reconhecidas, uma ignorada e um alerta, e retornou código
+1. Ao final, o aluno desativou o ambiente virtual.
+
+Resultado da validação:
+O aluno informou que o teste funcionou perfeitamente. Ficou demonstrado que o
+artefato pode ser instalado e executado em ambiente isolado, sem depender da
+configuração manual de PYTHONPATH usada durante os primeiros incrementos.
