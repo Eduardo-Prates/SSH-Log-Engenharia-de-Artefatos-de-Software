@@ -136,4 +136,12 @@ Todos os endereços utilizados pertencem a faixas reservadas para documentação
 - alertas indicam comportamento possível, não comprovam uma invasão;
 - nenhuma alteração de firewall ou bloqueio automático é realizada.
 
+## Documentação acadêmica
+
+- [Arquitetura](docs/ARCHITECTURE.md)
+- [Roteiro de demonstração](docs/DEMO.md)
+- [Checklist de entrega](docs/DELIVERY_CHECKLIST.md)
+- [Especificação](SPEC.md)
+- [Relato de uso da IA e decisões](RELATO.txt)
+
 A especificação e os limites de cada incremento estão em [SPEC.md](SPEC.md).

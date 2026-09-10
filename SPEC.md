@@ -276,10 +276,33 @@ ambientes diferentes.
 - um alerta representa uma heurística, não confirmação de comprometimento;
 - não há bloqueio, alteração de firewall ou resposta automática.
 
-## 14. Próximo incremento proposto
+## 14. Sexto incremento — preparação da entrega
 
-Após o primeiro resultado do CI no GitHub, corrigir eventuais diferenças entre
-plataformas e preparar a entrega acadêmica: diagrama de arquitetura, roteiro de
-demonstração, checklist final e tag de versão. A expansão do parser para novos
-formatos deve permanecer como trabalho futuro, salvo se houver evidência real e
-tempo para novos critérios de aceite.
+### 14.1 Artefatos finais
+
+- `docs/ARCHITECTURE.md` registra componentes, fluxo de dados, fronteiras e
+  decisões de segurança em texto e diagrama Mermaid;
+- `docs/DEMO.md` fornece uma apresentação reproduzível de aproximadamente cinco
+  minutos;
+- `docs/DELIVERY_CHECKLIST.md` separa evidências concluídas das ações finais do
+  aluno;
+- testes automatizados verificam links locais da documentação e consistência
+  da versão entre o pacote e o `pyproject.toml`.
+
+### 14.2 Critérios de aceite
+
+- **CA-36:** o diagrama representa entrada, parsing, normalização, detecção e
+  saídas sem sugerir bloqueio automático.
+- **CA-37:** o roteiro usa somente arquivos e opções existentes no repositório e
+  informa corretamente os códigos de saída.
+- **CA-38:** o checklist não marca como concluídos o commit, o CI e a tag que
+  dependem da publicação deste incremento.
+- **CA-39:** todos os links locais documentados resolvem para arquivos existentes.
+- **CA-40:** versão do pacote e versão da distribuição permanecem iguais.
+
+## 15. Fechamento proposto
+
+Após a validação humana desta documentação: publicar o commit final, observar o
+novo CI, conferir a renderização do Mermaid e criar a tag anotada `v0.5.0`. A
+expansão do parser para outros formatos deve permanecer como trabalho futuro,
+salvo exigência adicional da disciplina.

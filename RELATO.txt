@@ -286,10 +286,6 @@ configuração manual de PYTHONPATH usada durante os primeiros incrementos.
 
 Etapa: quinto incremento — qualidade e reprodução contínuas
 
-Prompt recebido:
-Após concluir e publicar a validação de instalação limpa, o aluno solicitou:
-"certo vamos prosseguir".
-
 Decisão humana:
 A solicitação foi aplicada ao incremento recomendado anteriormente: integração
 contínua, verificações de qualidade, teste sintético de maior volume e revisão
@@ -333,3 +329,60 @@ As verificações de qualidade e a matriz de compatibilidade estão descritas de
 forma reproduzível. Localmente, todos os critérios executáveis foram aprovados;
 a validação remota do GitHub Actions ainda deve ser observada após o próximo
 push.
+
+
+Validação humana remota do quinto incremento:
+O aluno publicou o commit 5d87e0c, identificado como "Add CI, Ruff checks, and
+volume regression tests", e compartilhou uma captura da primeira execução do
+workflow CI no GitHub Actions.
+
+A captura mostrou o status geral "Success" para a execução #1, acionada por
+push na branch main. O job "Quality checks" foi concluído com sucesso, assim
+como os quatro jobs da matriz: Python 3.11, Python 3.12, Python 3.13 e Python
+3.14. A duração total exibida foi de 19 segundos.
+
+Conclusão da validação humana:
+A pendência de validação remota registrada anteriormente foi satisfeita. O
+quinto incremento foi confirmado tanto localmente quanto no GitHub Actions em
+todas as versões de Python declaradas como suportadas.
+
+
+Etapa: sexto incremento — preparação da entrega acadêmica
+
+Prompt recebido:
+Após confirmar o sucesso remoto do CI, o aluno respondeu: "perfeito vamos
+prosseguir".
+
+Decisão humana:
+A solicitação foi aplicada à preparação dos artefatos finais já planejados. A
+criação da tag foi mantida pendente até a revisão humana, o commit final e a
+confirmação de uma nova execução do CI.
+
+Decisões técnicas:
+- A arquitetura foi documentada com Mermaid no próprio Markdown, permitindo
+  versionamento e renderização nativa pelo GitHub.
+- Foi criado um roteiro de demonstração de aproximadamente cinco minutos usando
+  apenas comandos e exemplos existentes no repositório.
+- Um checklist distingue evidências concluídas de ações que ainda dependem do
+  aluno, como revisar, publicar, conferir o CI final e criar a tag.
+- Foram adicionados testes para links Markdown locais e para igualdade entre a
+  versão da distribuição e a versão exposta pelo pacote.
+- A versão permaneceu 0.5.0, pois esta etapa prepara a entrega sem alterar o
+  comportamento funcional da aplicação.
+
+Refinamentos e validações executados em 10/09/2026:
+- A primeira verificação Ruff do novo teste documental encontrou somente a
+  ordenação de imports; a correção automática foi aplicada.
+- A suíte completa executou vinte e oito testes, todos aprovados, incluindo os
+  novos testes de integridade documental.
+- Os links locais apontaram para arquivos existentes e as duas declarações de
+  versão foram confirmadas como iguais.
+- Um comando central do roteiro foi executado com limiar seis e confirmou zero
+  alertas e código de saída zero.
+- A execução do CI para esta documentação permanece pendente até a publicação do
+  commit final.
+
+Resultado observado:
+O repositório possui agora documentação de arquitetura, roteiro de demonstração
+e checklist de entrega coerentes com o comportamento validado do artefato. A tag
+v0.5.0 ainda não foi criada, conforme a sequência de fechamento registrada.
