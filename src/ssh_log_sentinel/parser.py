@@ -1,13 +1,12 @@
 """Parser do subconjunto inicial de mensagens de autenticação OpenSSH."""
 
+import re
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone, tzinfo
+from datetime import UTC, datetime, timedelta, tzinfo
 from ipaddress import ip_address
-import re
 
 from .models import FailedAuthenticationAttempt
-
 
 _LOG_LINE = re.compile(
     r"^(?P<timestamp>"
@@ -50,7 +49,7 @@ def normalize_timestamp(
     timestamp_text: str,
     *,
     assumed_year: int | None = None,
-    default_timezone: tzinfo = timezone.utc,
+    default_timezone: tzinfo = UTC,
 ) -> datetime | None:
     """Normaliza ISO 8601 ou syslog para UTC quando há contexto suficiente."""
 
@@ -59,7 +58,7 @@ def normalize_timestamp(
             parsed = datetime.fromisoformat(timestamp_text.replace("Z", "+00:00"))
             if parsed.tzinfo is None:
                 parsed = parsed.replace(tzinfo=default_timezone)
-            return parsed.astimezone(timezone.utc)
+            return parsed.astimezone(UTC)
 
         syslog_timestamp = _SYSLOG_TIMESTAMP.fullmatch(timestamp_text)
         if syslog_timestamp is None or assumed_year is None:
@@ -74,7 +73,7 @@ def normalize_timestamp(
             int(syslog_timestamp.group("second")),
             tzinfo=default_timezone,
         )
-        return parsed.astimezone(timezone.utc)
+        return parsed.astimezone(UTC)
     except (KeyError, ValueError):
         return None
 
@@ -89,7 +88,7 @@ class TimestampNormalizer:
     """
 
     assumed_year: int | None = None
-    default_timezone: tzinfo = timezone.utc
+    default_timezone: tzinfo = UTC
     rollover_threshold: timedelta = timedelta(days=180)
     _current_year: int | None = field(init=False)
     _latest_syslog_timestamp: datetime | None = field(default=None, init=False)
@@ -116,8 +115,7 @@ class TimestampNormalizer:
 
         if (
             self._latest_syslog_timestamp is not None
-            and self._latest_syslog_timestamp - occurred_at
-            > self.rollover_threshold
+            and self._latest_syslog_timestamp - occurred_at > self.rollover_threshold
         ):
             assert self._current_year is not None
             self._current_year += 1
@@ -140,7 +138,7 @@ def parse_line(
     line: str,
     *,
     assumed_year: int | None = None,
-    default_timezone: tzinfo = timezone.utc,
+    default_timezone: tzinfo = UTC,
     timestamp_normalizer: TimestampNormalizer | None = None,
 ) -> FailedAuthenticationAttempt | None:
     """Converte uma linha suportada em evento; retorna ``None`` caso contrário."""
@@ -192,7 +190,7 @@ def parse_lines(
     lines: Iterable[str],
     *,
     assumed_year: int | None = None,
-    default_timezone: tzinfo = timezone.utc,
+    default_timezone: tzinfo = UTC,
 ) -> Iterator[FailedAuthenticationAttempt]:
     """Produz, em ordem, somente os eventos reconhecidos em ``lines``."""
 

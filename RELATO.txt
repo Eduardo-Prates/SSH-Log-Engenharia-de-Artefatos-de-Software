@@ -282,3 +282,54 @@ Resultado da validação:
 O aluno informou que o teste funcionou perfeitamente. Ficou demonstrado que o
 artefato pode ser instalado e executado em ambiente isolado, sem depender da
 configuração manual de PYTHONPATH usada durante os primeiros incrementos.
+
+
+Etapa: quinto incremento — qualidade e reprodução contínuas
+
+Prompt recebido:
+Após concluir e publicar a validação de instalação limpa, o aluno solicitou:
+"certo vamos prosseguir".
+
+Decisão humana:
+A solicitação foi aplicada ao incremento recomendado anteriormente: integração
+contínua, verificações de qualidade, teste sintético de maior volume e revisão
+das limitações, sem acrescentar novos formatos ao parser.
+
+Pesquisa e decisões técnicas:
+- Foram consultados os repositórios e a documentação oficiais das ações do
+  GitHub. As versões principais atuais actions/checkout@v7 e
+  actions/setup-python@v7 foram adotadas.
+- O workflow recebe apenas permissão contents: read e é acionado por push e
+  pull_request.
+- A suíte foi configurada em matriz para Python 3.11, 3.12, 3.13 e 3.14.
+- Ruff 0.16.0 foi adotado como dependência opcional de desenvolvimento para lint
+  e formatação. A aplicação permanece sem dependências externas de execução.
+- O teste de volume gera 10.000 linhas sintéticas determinísticas, usando apenas
+  redes reservadas para documentação. São esperados 1.000 eventos e dez alertas
+  independentes.
+- Não foi imposto limite de duração ao teste, evitando resultado instável entre
+  máquinas diferentes.
+
+Refinamentos e validações executados em 10/09/2026:
+- A primeira tentativa de instalar Ruff não acessou o PyPI devido às permissões
+  de rede do ambiente de execução. Após autorização explícita, a instalação no
+  ambiente virtual foi concluída com sucesso.
+- A primeira execução do Ruff encontrou somente ajustes mecânicos de imports,
+  modernização compatível com Python 3.11 e formatação. As correções automáticas
+  foram aplicadas e uma nova execução aprovou lint e formatação.
+- A suíte completa executou vinte e seis testes, todos aprovados.
+- O teste sintético processou 10.000 linhas, produziu 1.000 eventos e os dez
+  alertas esperados sem misturar endereços IP.
+- A compilação de src e tests com compileall terminou sem erros.
+- A configuração do workflow foi criada localmente, mas sua execução no GitHub
+  permanece pendente até o aluno publicar este incremento.
+- Ao atualizar os metadados editáveis para 0.5.0 sem isolamento de build, foi
+  observado que setuptools existia apenas no ambiente temporário usado pelo pip.
+  O backend foi então instalado no ambiente virtual, a reinstalação foi repetida
+  com sucesso e "pip show ssh-log-sentinel" confirmou a versão 0.5.0.
+
+Resultado observado:
+As verificações de qualidade e a matriz de compatibilidade estão descritas de
+forma reproduzível. Localmente, todos os critérios executáveis foram aprovados;
+a validação remota do GitHub Actions ainda deve ser observada após o próximo
+push.

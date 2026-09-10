@@ -1,14 +1,14 @@
 """Interface de linha de comando do SSH Log Sentinel."""
 
 import argparse
+import json
+import re
+import sys
 from collections.abc import Iterator, Sequence
 from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import timedelta, timezone
-import json
 from pathlib import Path
-import re
-import sys
 from typing import TextIO
 
 from .detector import detect_brute_force

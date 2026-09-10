@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta, timezone
-from ipaddress import ip_address
 import unittest
+from datetime import UTC, datetime, timedelta, timezone
+from ipaddress import ip_address
 
 from ssh_log_sentinel.parser import parse_line, parse_lines
 
@@ -43,7 +43,7 @@ class ParseLineTests(unittest.TestCase):
         self.assertEqual(event.source_ip, ip_address("2001:db8::10"))
         self.assertEqual(
             event.occurred_at,
-            datetime(2026, 9, 10, 12, 15, tzinfo=timezone.utc),
+            datetime(2026, 9, 10, 12, 15, tzinfo=UTC),
         )
 
     def test_normalizes_syslog_timestamp_with_explicit_context(self) -> None:
@@ -62,7 +62,7 @@ class ParseLineTests(unittest.TestCase):
         assert event is not None
         self.assertEqual(
             event.occurred_at,
-            datetime(2026, 1, 10, 15, 34, 56, tzinfo=timezone.utc),
+            datetime(2026, 1, 10, 15, 34, 56, tzinfo=UTC),
         )
 
     def test_ignores_accepted_authentication(self) -> None:
@@ -123,8 +123,8 @@ class ParseLineTests(unittest.TestCase):
         self.assertEqual(
             [event.occurred_at for event in events],
             [
-                datetime(2026, 12, 31, 23, 59, 30, tzinfo=timezone.utc),
-                datetime(2027, 1, 1, 0, 0, tzinfo=timezone.utc),
+                datetime(2026, 12, 31, 23, 59, 30, tzinfo=UTC),
+                datetime(2027, 1, 1, 0, 0, tzinfo=UTC),
             ],
         )
 

@@ -1,12 +1,11 @@
-from datetime import datetime, timedelta, timezone
-from ipaddress import ip_address
 import unittest
+from datetime import UTC, datetime, timedelta
+from ipaddress import ip_address
 
 from ssh_log_sentinel.detector import detect_brute_force
 from ssh_log_sentinel.models import FailedAuthenticationAttempt
 
-
-_BASE_TIME = datetime(2026, 9, 10, 12, 0, tzinfo=timezone.utc)
+_BASE_TIME = datetime(2026, 9, 10, 12, 0, tzinfo=UTC)
 
 
 def _event(

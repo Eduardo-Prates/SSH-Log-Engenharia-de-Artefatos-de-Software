@@ -225,10 +225,61 @@ sujeitas à verificação de ordem do detector.
 - **CA-27:** erros durante leitura, detecção ou escrita retornam código 2.
 - **CA-28:** nenhuma dessas opções executa resposta automática ou bloqueio.
 
-## 12. Próximo incremento proposto
+## 12. Quinto incremento — qualidade e reprodução contínuas
 
-Preparar o artefato para entrega e reprodução: adicionar verificação automatizada
-em múltiplas versões suportadas do Python, revisar mensagens de erro e ajuda,
-documentar limitações de formatos OpenSSH e avaliar o parser com uma amostra
-maior e anonimizada. Novos formatos de autenticação só devem ser incluídos após
-casos reais e critérios de aceite correspondentes.
+### 12.1 Integração contínua
+
+O workflow `.github/workflows/ci.yml` é acionado por `push` e `pull_request` e
+possui permissão somente de leitura do conteúdo. Ele separa dois objetivos:
+
+- qualidade em Python 3.14, com Ruff para lint e verificação de formatação;
+- testes e compilação em Python 3.11, 3.12, 3.13 e 3.14.
+
+Ruff é dependência opcional de desenvolvimento, fixada na versão 0.16.0. A
+aplicação continua sem dependências externas em tempo de execução.
+
+### 12.2 Avaliação sintética de volume
+
+O teste de volume gera 10.000 linhas em memória de forma determinística. Desse
+total, 1.000 representam falhas distribuídas entre dez endereços das faixas de
+documentação. Com limiar 5 e janela 400 segundos, são esperados exatamente dez
+alertas, um por IP. As demais linhas representam autenticações aceitas e devem
+ser ignoradas pelo parser deste incremento.
+
+O teste verifica correção e separação de estado em uma entrada maior, mas não
+define limite rígido de tempo, pois uma asserção temporal seria instável entre
+ambientes diferentes.
+
+### 12.3 Critérios de aceite
+
+- **CA-29:** o workflow é executado em pushes e pull requests com permissão de
+  conteúdo somente para leitura.
+- **CA-30:** a suíte é configurada para todas as versões Python de 3.11 a 3.14.
+- **CA-31:** lint e formatação são verificados automaticamente e podem ser
+  reproduzidos no ambiente de desenvolvimento.
+- **CA-32:** a dependência de qualidade não se torna dependência de execução.
+- **CA-33:** a entrada sintética de 10.000 linhas produz 1.000 eventos e dez
+  alertas independentes.
+- **CA-34:** limitações, evidências versionadas e comandos de reprodução estão
+  documentados.
+- **CA-35:** a configuração local passa por testes, compileall, lint e
+  verificação de formatação antes do envio ao GitHub.
+
+## 13. Limitações consolidadas
+
+- apenas `Failed password` no formato especificado é reconhecido;
+- timestamps syslog dependem do ano e fuso informados pelo usuário;
+- a heurística de virada do ano pode ser ambígua em arquivos esparsos ou
+  reordenados;
+- eventos de cada IP precisam estar em ordem cronológica;
+- não há acompanhamento contínuo de arquivos nem integração com journald;
+- um alerta representa uma heurística, não confirmação de comprometimento;
+- não há bloqueio, alteração de firewall ou resposta automática.
+
+## 14. Próximo incremento proposto
+
+Após o primeiro resultado do CI no GitHub, corrigir eventuais diferenças entre
+plataformas e preparar a entrega acadêmica: diagrama de arquitetura, roteiro de
+demonstração, checklist final e tag de versão. A expansão do parser para novos
+formatos deve permanecer como trabalho futuro, salvo se houver evidência real e
+tempo para novos critérios de aceite.

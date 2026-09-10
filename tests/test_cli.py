@@ -1,9 +1,9 @@
+import json
+import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
-import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import unittest
 from unittest.mock import patch
 
 from ssh_log_sentinel.cli import main

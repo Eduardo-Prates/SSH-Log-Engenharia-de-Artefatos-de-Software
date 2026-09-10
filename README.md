@@ -1,5 +1,7 @@
 # SSH Log Sentinel
 
+[![CI](https://github.com/Eduardo-Prates/SSH-Log-Sentinel---Engenharia-de-Artefatos-de-Software/actions/workflows/ci.yml/badge.svg)](https://github.com/Eduardo-Prates/SSH-Log-Sentinel---Engenharia-de-Artefatos-de-Software/actions/workflows/ci.yml)
+
 Protótipo acadêmico de uma ferramenta CLI em Python 3.11+ para analisar logs
 de autenticação do OpenSSH e, em incrementos futuros, sinalizar possíveis
 ataques de força bruta.
@@ -97,5 +99,41 @@ python -m ssh_log_sentinel .\examples\sample-year-rollover.log `
 $env:PYTHONPATH = "src"
 python -m unittest discover -s tests -v
 ```
+
+Para instalar também as ferramentas de desenvolvimento e reproduzir todas as
+verificações do CI:
+
+```powershell
+python -m pip install -e ".[dev]"
+ruff check --no-cache .
+ruff format --no-cache --check .
+python -m unittest discover -s tests -v
+python -m compileall -q src tests
+```
+
+O workflow em `.github/workflows/ci.yml` executa lint e formatação, além da suíte
+em Python 3.11, 3.12, 3.13 e 3.14, a cada `push` e `pull_request`. O teste de
+volume gera deterministicamente 10.000 linhas sintéticas; nenhuma amostra real
+ou dado pessoal é incorporado.
+
+## Evidências versionadas
+
+- `teste-auth.log`: entrada pequena usada nas validações manuais;
+- `alerts-validacao.jsonl`: alerta resultante conferido pelo aluno;
+- `examples/`: entradas reproduzíveis dos cenários de força bruta e virada de
+  ano.
+
+Todos os endereços utilizados pertencem a faixas reservadas para documentação.
+
+## Limitações conhecidas
+
+- somente mensagens `Failed password` no formato documentado são reconhecidas;
+- outros métodos e variantes de mensagens OpenSSH ainda não são analisados;
+- logs syslog precisam de ano e fuso fornecidos pelo usuário para detecção;
+- a virada de ano usa uma heurística de regressão superior a 180 dias;
+- o detector pressupõe ordem cronológica por IP;
+- a ferramenta analisa entradas finitas e não acompanha o arquivo em tempo real;
+- alertas indicam comportamento possível, não comprovam uma invasão;
+- nenhuma alteração de firewall ou bloqueio automático é realizada.
 
 A especificação e os limites de cada incremento estão em [SPEC.md](SPEC.md).
