@@ -282,8 +282,8 @@ ambientes diferentes.
 
 - `docs/ARCHITECTURE.md` registra componentes, fluxo de dados, fronteiras e
   decisões de segurança em texto e diagrama Mermaid;
-- `docs/DEMO.md` fornece uma apresentação reproduzível de aproximadamente cinco
-  minutos;
+- `docs/REPRODUCIBILITY.md` relaciona alegações, ambiente, comandos e resultados
+  esperados;
 - `docs/DELIVERY_CHECKLIST.md` separa evidências concluídas das ações finais do
   aluno;
 - testes automatizados verificam links locais da documentação e consistência
@@ -293,16 +293,46 @@ ambientes diferentes.
 
 - **CA-36:** o diagrama representa entrada, parsing, normalização, detecção e
   saídas sem sugerir bloqueio automático.
-- **CA-37:** o roteiro usa somente arquivos e opções existentes no repositório e
-  informa corretamente os códigos de saída.
+- **CA-37:** o protocolo usa somente arquivos e opções existentes no repositório
+  e informa corretamente os resultados esperados.
 - **CA-38:** o checklist não marca como concluídos o commit, o CI e a tag que
   dependem da publicação deste incremento.
 - **CA-39:** todos os links locais documentados resolvem para arquivos existentes.
 - **CA-40:** versão do pacote e versão da distribuição permanecem iguais.
 
-## 15. Fechamento proposto
+## 15. Sétimo incremento — revisão crítica por IA
 
-Após a validação humana desta documentação: publicar o commit final, observar o
-novo CI, conferir a renderização do Mermaid e criar a tag anotada `v0.5.0`. A
-expansão do parser para outros formatos deve permanecer como trabalho futuro,
-salvo exigência adicional da disciplina.
+### 15.1 Avaliação inicial
+
+A revisão em `docs/AI_REVIEW.md` considera explicitamente disponibilidade,
+funcionalidade, sustentabilidade e reprodutibilidade. A versão 0.5.0 apresentou
+boa funcionalidade, mas lacunas em instalação consolidada, metadados do pacote,
+orientação de manutenção e reprodução automatizada.
+
+### 15.2 Ações decorrentes
+
+- adicionados metadados de licença, repositório e citação;
+- adicionados changelog e guia de contribuição;
+- criado protocolo de reprodução em um comando;
+- acrescentada verificação de reprodução ao CI;
+- ampliados README e testes de integridade documental;
+- atualizada a versão para 0.5.1.
+
+Docker, bloqueio automático e novos formatos de log não foram implementados; as
+justificativas técnicas estão registradas na revisão. A tag leve `v0.5.0` não é
+movida ou apagada. A correção será publicada em nova tag anotada.
+
+### 15.3 Critérios de aceite
+
+- **CA-41:** a revisão cobre nominalmente os quatro critérios solicitados.
+- **CA-42:** cada problema pertinente possui correção ou justificativa técnica.
+- **CA-43:** as principais alegações podem ser verificadas por um único comando.
+- **CA-44:** o CI executa o protocolo de reprodução além da suíte convencional.
+- **CA-45:** a distribuição declara licença e URL do repositório.
+- **CA-46:** todas as ações da revisão são registradas no relato final.
+
+## 16. Fechamento proposto
+
+Após validar as correções: publicar a versão 0.5.1, observar o novo CI, conferir
+os documentos no GitHub e criar a tag anotada `v0.5.1`. Um DOI ou depósito em
+repositório de preservação depende de decisão e conta do autor.

@@ -12,6 +12,8 @@ class DocumentationTests(unittest.TestCase):
         markdown_files = [
             _PROJECT_ROOT / "README.md",
             _PROJECT_ROOT / "SPEC.md",
+            _PROJECT_ROOT / "CHANGELOG.md",
+            _PROJECT_ROOT / "CONTRIBUTING.md",
             *_PROJECT_ROOT.joinpath("docs").glob("*.md"),
         ]
         missing_links: list[str] = []
@@ -36,6 +38,20 @@ class DocumentationTests(unittest.TestCase):
             distribution_version = tomllib.load(pyproject_file)["project"]["version"]
 
         self.assertEqual(distribution_version, ssh_log_sentinel.__version__)
+
+    def test_distribution_declares_license_and_repository(self) -> None:
+        import tomllib
+
+        with (_PROJECT_ROOT / "pyproject.toml").open("rb") as pyproject_file:
+            project = tomllib.load(pyproject_file)["project"]
+
+        self.assertEqual(project["license"], "MIT")
+        self.assertTrue((_PROJECT_ROOT / "LICENSE").is_file())
+        self.assertEqual(
+            project["urls"]["Repository"],
+            "https://github.com/Eduardo-Prates/"
+            "SSH-Log-Sentinel---Engenharia-de-Artefatos-de-Software",
+        )
 
 
 if __name__ == "__main__":

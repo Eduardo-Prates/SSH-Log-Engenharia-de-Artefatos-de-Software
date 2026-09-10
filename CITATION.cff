@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "Se você utilizar este artefato, cite-o usando estes metadados."
+title: "SSH Log Sentinel"
+type: software
+authors:
+  - family-names: "Tiadoro"
+    given-names: "Eduardo Prates"
+version: 0.5.1
+date-released: 2026-09-10
+repository-code: "https://github.com/Eduardo-Prates/SSH-Log-Sentinel---Engenharia-de-Artefatos-de-Software"
+license: MIT
+

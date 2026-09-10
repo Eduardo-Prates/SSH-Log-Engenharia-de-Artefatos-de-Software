@@ -14,6 +14,9 @@
 - [x] Prompts, decisões, refinamentos e validações registrados em `RELATO.txt`.
 - [x] Limitações conhecidas declaradas no `README.md` e em `SPEC.md`.
 - [x] Arquitetura documentada em `docs/ARCHITECTURE.md`.
+- [x] Revisão crítica por IA registrada em `docs/AI_REVIEW.md`.
+- [x] Protocolo de reprodução registrado em `docs/REPRODUCIBILITY.md`.
+- [x] Licença, citação, changelog e contribuição documentados.
 
 ## Qualidade
 
@@ -26,9 +29,10 @@
 ## Fechamento pendente
 
 - [x] Executar a suíte após adicionar a documentação final.
-- [X] Criar commit final e publicar no GitHub.
-- [X] Confirmar que o CI do commit final está verde.
-- [X] Criar a tag anotada `v0.5.0` e publicá-la.
-- [X] Conferir a renderização do diagrama Mermaid no GitHub.
-- [X] Entregar o link do repositório e as evidências exigidas pela disciplina.
-
+- [x] Publicar a versão 0.5.0 e confirmar seu CI.
+- [x] Publicar a tag leve `v0.5.0`.
+- [x] Conferir a renderização do diagrama Mermaid no GitHub.
+- [x] Validar localmente as correções da revisão por IA.
+- [X] Publicar o commit da versão 0.5.1.
+- [X] Confirmar que o CI da versão 0.5.1 está verde.
+- [X] Criar e publicar a tag anotada `v0.5.1`.

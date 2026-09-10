@@ -2,13 +2,54 @@
 
 [![CI](https://github.com/Eduardo-Prates/SSH-Log-Sentinel---Engenharia-de-Artefatos-de-Software/actions/workflows/ci.yml/badge.svg)](https://github.com/Eduardo-Prates/SSH-Log-Sentinel---Engenharia-de-Artefatos-de-Software/actions/workflows/ci.yml)
 
-Protótipo acadêmico de uma ferramenta CLI em Python 3.11+ para analisar logs
-de autenticação do OpenSSH e, em incrementos futuros, sinalizar possíveis
-ataques de força bruta.
+Artefato acadêmico de uma ferramenta CLI em Python 3.11+ para analisar logs de
+autenticação do OpenSSH e sinalizar padrões compatíveis com possíveis ataques de
+força bruta.
 
-O primeiro incremento implementou a leitura de linhas `Failed password`. O
-segundo acrescentou timestamps normalizados e um detector independente por
-limiar e janela. A CLI ainda não classifica endereços IP nem executa bloqueios.
+O parser transforma linhas `Failed password` em eventos validados. Um detector
+independente aplica limiar e janela temporal por endereço IP. A ferramenta gera
+alertas, mas não confirma invasões, classifica reputação nem bloqueia endereços.
+
+## Critérios de avaliação considerados
+
+Este repositório prepara evidências para os quatro critérios de artefatos
+científicos: disponibilidade, funcionalidade, sustentabilidade e
+reprodutibilidade. A [revisão crítica por IA](docs/AI_REVIEW.md) registra pontos
+fortes, problemas encontrados, correções e sugestões não adotadas.
+
+## Requisitos
+
+- Python 3.11, 3.12, 3.13 ou 3.14;
+- Windows, Linux ou macOS;
+- nenhuma dependência externa em tempo de execução;
+- Git apenas para clonar o repositório.
+
+Não há requisito especial de hardware, serviço externo, credencial ou acesso de
+administrador.
+
+## Instalação recomendada
+
+```text
+git clone https://github.com/Eduardo-Prates/SSH-Log-Sentinel---Engenharia-de-Artefatos-de-Software.git
+cd SSH-Log-Sentinel---Engenharia-de-Artefatos-de-Software
+python -m venv .venv
+```
+
+No PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m pip install .
+ssh-log-sentinel --help
+```
+
+Em Linux ou macOS:
+
+```bash
+source .venv/bin/activate
+python -m pip install .
+ssh-log-sentinel --help
+```
 
 ## Executar localmente
 
@@ -139,8 +180,13 @@ Todos os endereços utilizados pertencem a faixas reservadas para documentação
 ## Documentação acadêmica
 
 - [Arquitetura](docs/ARCHITECTURE.md)
+- [Protocolo de reprodutibilidade](docs/REPRODUCIBILITY.md)
+- [Revisão crítica por IA](docs/AI_REVIEW.md)
 - [Checklist de entrega](docs/DELIVERY_CHECKLIST.md)
 - [Especificação](SPEC.md)
 - [Relato de uso da IA e decisões](RELATO.txt)
+- [Histórico de versões](CHANGELOG.md)
+- [Como contribuir](CONTRIBUTING.md)
+- [Metadados de citação](CITATION.cff)
 
 A especificação e os limites de cada incremento estão em [SPEC.md](SPEC.md).

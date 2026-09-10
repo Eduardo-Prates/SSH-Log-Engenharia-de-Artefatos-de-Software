@@ -386,3 +386,92 @@ Resultado observado:
 O repositório possui agora documentação de arquitetura, roteiro de demonstração
 e checklist de entrega coerentes com o comportamento validado do artefato. A tag
 v0.5.0 ainda não foi criada, conforme a sequência de fechamento registrada.
+
+
+Etapa: revisão crítica pós-publicação por IA
+
+Prompt recebido:
+O aluno apresentou a exigência de submeter o artefato publicado a uma ferramenta
+de IA e solicitou uma avaliação crítica que considerasse explicitamente quatro
+critérios de artefatos científicos: disponibilidade, funcionalidade,
+sustentabilidade e reprodutibilidade. O prompt também determinou analisar os
+problemas, corrigir ou melhorar o que fosse pertinente e justificar sugestões
+não implementadas, registrando as ações no relato final. Foi fornecido como
+referência o endereço https://doc-artefatos.github.io/sbseg2026/.
+
+Evidências examinadas:
+- A orientação de avaliação do SBSeg foi consultada para caracterizar os quatro
+  critérios e as informações esperadas no README.
+- Uma consulta anônima ao repositório remoto confirmou que a branch main e a tag
+  v0.5.0 estavam publicamente acessíveis no commit 44ebbc6.
+- A consulta mostrou que v0.5.0 era uma tag leve. Isso divergia da afirmação do
+  checklist de que a tag publicada era anotada.
+- Foram examinados README, especificação, licença MIT, arquitetura, checklist,
+  código, testes, workflow e metadados de empacotamento.
+
+Avaliação inicial da IA:
+- Disponibilidade: parcialmente atendida. O repositório, README, licença e tag
+  estavam públicos, mas faltavam citação e metadados completos no pacote, e a
+  tag publicada não era anotada.
+- Funcionalidade: atendida com ressalvas. Instalação, exemplos, testes e CI
+  demonstravam as funções, mas o README não consolidava a instalação limpa como
+  caminho principal para o avaliador.
+- Sustentabilidade: parcialmente atendida. A arquitetura era modular e coberta
+  por CI, porém faltavam changelog, guia de contribuição e licença nos metadados
+  da distribuição.
+- Reprodutibilidade: parcialmente atendida. Existiam exemplos e teste sintético,
+  mas não havia comando único que relacionasse alegações e resultados. O roteiro
+  de demonstração registrado anteriormente havia sido removido no commit
+  44ebbc6.
+
+Ações implementadas a partir da revisão:
+- A versão foi atualizada para 0.5.1.
+- O README passou a concentrar requisitos, instalação limpa em Windows, Linux e
+  macOS, critérios considerados e ligações para os documentos acadêmicos.
+- A licença MIT e as URLs de repositório e issues foram incluídas nos metadados
+  do pacote; o backend mínimo foi atualizado para setuptools 77.
+- Foram adicionados CHANGELOG.md, CONTRIBUTING.md e CITATION.cff.
+- Foi criado docs/AI_REVIEW.md com a avaliação crítica completa.
+- Foi criado docs/REPRODUCIBILITY.md, relacionando alegações, ambiente, comandos
+  e resultados esperados.
+- Foi criado scripts/reproduce.py para reproduzir em um comando a suíte, o
+  alerta principal, o cenário sem alerta e a virada do ano.
+- O workflow passou a executar o protocolo de reprodução em um job próprio.
+- Testes documentais passaram a verificar links, versão, licença e URL do
+  repositório.
+- SPEC.md e o checklist foram corrigidos para registrar que v0.5.0 é uma tag
+  leve e que a próxima publicação deve usar uma nova tag anotada v0.5.1.
+
+Sugestões não implementadas e justificativas:
+- Docker não foi adicionado porque a aplicação não possui dependências externas
+  de runtime, já usa venv e CI multiplataforma; um container adicionaria
+  manutenção sem resolver dependência nativa.
+- Bloqueio automático permaneceu excluído por segurança e por decisão humana de
+  escopo registrada desde a primeira etapa.
+- Novos formatos OpenSSH foram adiados por falta de amostras representativas e
+  critérios de aceite específicos.
+- DOI ou arquivamento externo não foi criado porque depende de conta e decisão
+  do autor.
+- A tag pública v0.5.0 não foi apagada nem movida, pois reescrever uma referência
+  publicada prejudicaria a rastreabilidade. Foi proposta a tag anotada v0.5.1.
+
+Refinamentos e validações executados em 10/09/2026:
+- A primeira execução Ruff do script de reprodução encontrou somente ordenação
+  de imports e formatação; as correções mecânicas foram aplicadas.
+- Ruff aprovou lint e formatação de vinte arquivos.
+- A suíte completa executou vinte e nove testes, todos aprovados.
+- O protocolo scripts/reproduce.py concluiu com código zero e confirmou as
+  quatro alegações declaradas.
+- As mensagens finais do protocolo foram limitadas a caracteres ASCII para
+  permanecerem legíveis em terminais Windows com páginas de código distintas.
+- A distribuição editável 0.5.1 foi construída e instalada com sucesso.
+- Os metadados instalados confirmaram versão 0.5.1, expressão de licença MIT e
+  URLs de Repository e Issues.
+- A execução remota do novo job de reprodução permanece pendente até o aluno
+  publicar as correções.
+
+Resultado observado:
+Os problemas pertinentes levantados pela IA receberam correções documentais,
+de empacotamento, automação ou testes. As sugestões não adotadas possuem
+justificativa técnica explícita. A versão 0.5.1 permanece pendente de publicação,
+CI remoto e criação de tag anotada.
