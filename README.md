@@ -139,7 +139,6 @@ Todos os endereços utilizados pertencem a faixas reservadas para documentação
 ## Documentação acadêmica
 
 - [Arquitetura](docs/ARCHITECTURE.md)
-- [Roteiro de demonstração](docs/DEMO.md)
 - [Checklist de entrega](docs/DELIVERY_CHECKLIST.md)
 - [Especificação](SPEC.md)
 - [Relato de uso da IA e decisões](RELATO.txt)
